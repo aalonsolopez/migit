@@ -4,6 +4,8 @@ mod commands;
 mod data;
 mod utils;
 
+pub const MIGIT_DIR: &'static str = ".migit";
+
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
