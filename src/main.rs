@@ -1,33 +1,37 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
 mod commands;
 mod data;
+mod utils;
 
 #[derive(Parser)]
+#[command(author, version, about, long_about = None)]
 struct Cli {
-    argument: String,
-    path: String
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    Init,
+    
+    HashObject {
+        #[arg(required = true)]
+        path: String,
+    },
 }
 
 fn main() {
-    let args = Cli::parse();
+    let cli = Cli::parse();
 
-    let error_flag: i8;
-
-    match args.argument.as_str() {
-        "init" => {
-            error_flag = commands::init_command()
-        },
-        "hash-object" => {
-            error_flag = commands::hash_object_command(&args.path)
-        },
-        _ => {
-            println!("Unknown command");
-            error_flag = 0;
-        },
-    }
+    let error_flag = match cli.command {
+        Commands::Init => commands::init_command(),
+        Commands::HashObject { path } => {
+            commands::hash_object_command(&path)
+        }
+    };
 
     if error_flag == 1 {
-        println!("Error during {} command.", args.argument)
+        println!("Error durante la ejecución del comando")
     }
 }
