@@ -31,7 +31,7 @@ pub fn init_directory() -> i8 {
         }
     }
 
-    println!("Initialized empty migit repository in {}/{}", current_dir, crate::MIGIT_DIR);
+    println!("Initialized empty migit repository in {}{}", current_dir, crate::MIGIT_DIR);
     
     error_flag
 }
