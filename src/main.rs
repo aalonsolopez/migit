@@ -21,6 +21,11 @@ enum Commands {
         #[arg(required = true)]
         path: String,
     },
+
+    CatFile {
+        #[arg(required=true)]
+        file_name: String,
+    }
 }
 
 fn main() {
@@ -30,6 +35,9 @@ fn main() {
         Commands::Init => commands::init_command(),
         Commands::HashObject { path } => {
             commands::hash_object_command(&path)
+        },
+        Commands::CatFile { file_name } => {
+            commands::cat_file_command(&file_name)
         }
     };
 

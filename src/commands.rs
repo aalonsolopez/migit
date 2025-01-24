@@ -23,8 +23,6 @@ pub fn hash_object_command(path: &str) -> i8 {
 }
 
 pub fn cat_file_command(file_name: &str) -> i8 {
-    let data_blob: Vec<u8>;
-
     let formated_path = format!("/{}/objects/{}", crate::MIGIT_DIR, file_name);
 
     let path = utils::path_creator(Some(&formated_path));

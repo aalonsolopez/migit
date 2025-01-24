@@ -3,20 +3,37 @@
 use std::fs;
 use sha1::{Digest, Sha1};
 
-use crate::{data, utils};
+use crate::utils;
 
 pub fn init_directory() -> i8 {
     let current_dir = utils::path_creator(None);
+    let mut error_flag: i8 = 0;
+    
     match fs::create_dir(crate::MIGIT_DIR) {
         Ok(_) => {
-            println!("Initialized empty migit repository in {}/{}", current_dir, crate::MIGIT_DIR);
-            0
+            println!("Created .migit directory");
         },
         Err(e) => {
-            println!("There has been an error {}", e);
-            1
+            println!("There has been an error creating .migit directory: {}", e);
+            error_flag = 1;
         }
     }
+
+    if error_flag != 1 {
+        match fs::create_dir(format!("{}/objects", crate::MIGIT_DIR)) {
+            Ok(_) => {
+                println!("Created .migit/objects directory");
+            },
+            Err(e) => {
+                println!("There has been an error creating .migit/object directory: {}", e);
+                error_flag = 1;
+            }
+        }
+    }
+
+    println!("Initialized empty migit repository in {}/{}", current_dir, crate::MIGIT_DIR);
+    
+    error_flag
 }
 
 pub fn hash_object(data: Vec<u8>) -> i8 {
