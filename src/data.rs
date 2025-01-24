@@ -36,10 +36,16 @@ pub fn init_directory() -> i8 {
     error_flag
 }
 
-pub fn hash_object(data: Vec<u8>) -> i8 {
-    let mut hasher = Sha1::new();
-    hasher.update(&data);
+pub fn hash_object(data: Vec<u8>, object_type: Option<&str>) -> i8 {
+    // Adds blob and a 0x00 at the beginning of the doc
+    let o_type = object_type.unwrap_or("blob");
+    let mut content = o_type.as_bytes().to_vec();
+    content.push(0);
+    content.extend(data);
 
+    // Hash stage
+    let mut hasher = Sha1::new();
+    hasher.update(&content);
     let hashed_data = hasher.finalize();
 
     let formated_hash = format!("{:x}", hashed_data);
@@ -48,7 +54,7 @@ pub fn hash_object(data: Vec<u8>) -> i8 {
     
     let path_to_write: String = format!("{}/{}/objects/{}", current_dir, crate::MIGIT_DIR, formated_hash);
 
-    match fs::write(path_to_write, &data) {
+    match fs::write(path_to_write, &content) {
         Ok(_) => {
             println!("File created! Object {} created in {}", formated_hash, crate::MIGIT_DIR);
             0
@@ -60,14 +66,37 @@ pub fn hash_object(data: Vec<u8>) -> i8 {
     }
 }
 
-pub fn cat_file(path: &str) -> i8 {
-    return match fs::read_to_string(path) {
-        Ok(data_string) => {
-            println!("{}", data_string);
+fn get_object(hash: &str, expected_type: Option<&str>) -> Result<Vec<u8>, String> {
+    let path = format!("{}/objects/{}", crate::MIGIT_DIR, hash);
+    
+    let content = fs::read(&path)
+        .map_err(|e| format!("Error leyendo objeto: {}", e))?;
+        
+    // Separate type and content
+    let null_pos = content.iter()
+        .position(|&b| b == 0)
+        .ok_or("Formato de objeto inválido")?;
+        
+    let tipo = String::from_utf8_lossy(&content[..null_pos]);
+    
+    // Verify if type is the expected type
+    if let Some(expected) = expected_type {
+        if tipo != expected {
+            return Err(format!("Tipo incorrecto {} (esperado {})", tipo, expected));
+        }
+    }
+    
+    Ok(content[null_pos + 1..].to_vec())
+}
+
+pub fn cat_file(hash: &str) -> i8 {
+    match get_object(hash, None) {
+        Ok(data) => {
+            println!("{}", String::from_utf8_lossy(&data));
             0
         },
         Err(e) => {
-            println!("Error reading the file {}: {}", path, e);
+            println!("Error: {}", e);
             1
         }
     }
