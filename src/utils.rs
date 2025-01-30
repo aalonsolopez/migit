@@ -10,3 +10,10 @@ pub fn path_creator(path: Option<&str>) -> PathBuf {
         None => current_dir
     }
 }
+
+pub fn is_ignored(path: PathBuf) -> bool {
+    path.to_str()
+        .unwrap()
+        .split("/")
+        .any(|p| p == ".migit")
+}
