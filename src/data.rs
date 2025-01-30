@@ -114,3 +114,24 @@ pub fn cat_file(hash: &PathBuf) -> i8 {
         }
     }
 }
+
+pub fn hash_object_without_saving(data: Vec<u8>, object_type: Option<&str>) -> String {
+    let o_type = object_type.unwrap_or("blob");
+    
+    let mut content = o_type.as_bytes().to_vec();
+    
+    content.push(0);
+    
+    content.extend(data);
+
+    // Hash stage
+    let mut hasher = Sha1::new();
+    
+    hasher.update(&content);
+    
+    let hashed_data = hasher.finalize();
+
+    let formated_hash = format!("{:x}", hashed_data);
+
+    return formated_hash;
+}

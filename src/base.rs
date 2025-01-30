@@ -1,6 +1,6 @@
 use std::{fs, path};
 
-use crate::utils::is_ignored;
+use crate::{data, utils::is_ignored};
 
 // Write the tree of the files in the given path
 pub fn write_tree(path: &str) -> i8 {
@@ -16,11 +16,12 @@ pub fn write_tree(path: &str) -> i8 {
                 if is_ignored(path.to_path_buf()) {
                     continue;
                 }
-                
+
                 if file_type.is_dir() {
                     write_tree(path.join(&file_name).to_str().unwrap());
                 } else {
-                    println!("File: {}", file_name);
+                    let file_content = fs::read(file.path()).unwrap();
+                    println!("File named {} content hashed: {}", file_name, data::hash_object_without_saving(file_content, Some("blob")));
                 }   
             }
         },
