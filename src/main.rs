@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 mod commands;
 mod data;
 mod utils;
+mod base;
 
 pub const MIGIT_DIR: &'static str = ".migit";
 
@@ -25,6 +26,10 @@ enum Commands {
     CatFile {
         #[arg(required=true)]
         file_name: String,
+    },
+    WriteTree {
+        #[arg(required=true)]
+        path: String,
     }
 }
 
@@ -38,6 +43,9 @@ fn main() {
         },
         Commands::CatFile { file_name } => {
             commands::cat_file_command(&file_name)
+        },
+        Commands::WriteTree { path } => {
+            commands::write_tree(&path)
         }
     };
 

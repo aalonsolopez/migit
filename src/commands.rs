@@ -2,7 +2,7 @@
 
 use std::fs;
 
-use crate::{data, utils};
+use crate::{data, utils, base};
 
 pub fn init_command() -> i8 {
     return data::init_directory(); 
@@ -30,4 +30,8 @@ pub fn cat_file_command(file_name: &str) -> i8 {
     let path = utils::path_creator(Some(&formated_path));
 
     return data::cat_file(&path);
+}
+
+pub fn write_tree(path: &str) -> i8 {
+    return base::write_tree(path);
 }
